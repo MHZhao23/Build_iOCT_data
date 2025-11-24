@@ -143,11 +143,11 @@ def collect_tool_paths(group_folders):
     return img_paths, mask_paths
 
 # Paths
-oct_root = "./AROI - online/24 patient"
-tools_root = "./tools"
-output_img_root = "./Synthetic_iOCT/train/JPEGImages"
-output_all_img_root = "./Synthetic_iOCT/train/JPEGImagesAll"
-output_mask_root = "./Synthetic_iOCT/train/Annotations"
+oct_root = "./datasets/AROI - online/24 patient"
+tools_root = "./datasets/tools"
+output_img_root = "./datasets/Synthetic_iOCT/train/JPEGImages"
+output_all_img_root = "./datasets/Synthetic_iOCT/train/JPEGImagesAll"
+output_mask_root = "./datasets/Synthetic_iOCT/train/Annotations"
 
 # Sort paths
 tool_groups = {
@@ -216,7 +216,8 @@ for patient in tqdm(patients):
     # Generate synthetic frames
     # brightness_oct = np.random.random_integers(4, 11) * 0.1
     # brightness_tool = np.random.random_integers(4, 10) * 0.1
-    p_flip = random.random()
+    np.random.seed(int(p_i))
+    p_flip = np.random.random()
     for i in range(num_oct_frames):
         oct_name = os.path.basename(all_oct_images[i])
         oct_image = Image.open(all_oct_images[i]).convert("L")
