@@ -205,6 +205,20 @@ tools_root = "./datasets/tools"
 output_img_root = "./datasets/Synthetic_iOCT/train/JPEGImages"
 output_mask_root = "./datasets/Synthetic_iOCT/train/Annotations"
 
+fs_img_root = "./datasets/Synthetic_iOCT/train/images"
+fs_mask_root = "./datasets/Synthetic_iOCT/train/masks"
+os.makedirs(fs_img_root, exist_ok=True)
+os.makedirs(fs_mask_root, exist_ok=True)
+
+yolo_img_train_root = "./datasets/Synthetic_iOCT/yolo/images/train"
+yolo_mask_train_root = "./datasets/Synthetic_iOCT/yolo/masks/train"
+yolo_img_val_root = "./datasets/Synthetic_iOCT/yolo/images/val"
+yolo_mask_val_root = "./datasets/Synthetic_iOCT/yolo/masks/val"
+os.makedirs(yolo_img_train_root, exist_ok=True)
+os.makedirs(yolo_mask_train_root, exist_ok=True)
+os.makedirs(yolo_img_val_root, exist_ok=True)
+os.makedirs(yolo_mask_val_root, exist_ok=True)
+
 # Sort paths
 tool_groups = {
     "Cutter_25_1": [f"Cutter_25_1{ch}" for ch in "ab"],
@@ -224,6 +238,7 @@ for group_name, (img_paths, mask_paths) in tool_sequences.items():
     assert len(all_image_paths) == len(all_mask_paths)
 
 # Process all patients
+image_idx = 0
 start_idx = 0
 img_size = 512
 patients = sorted(os.listdir(oct_root))
@@ -299,10 +314,32 @@ for patient in tqdm(patients):
         oct_mask_array[:, x1:x2] = 0
         oct_mask_array[mask] = tool_mask_array[mask]
 
-        out_name = oct_name.split('_')[1][3:]
+        # # for SAM2 dataset
+        # out_name = oct_name.split('_')[1][3:]
+        # oct_image_new = Image.fromarray(oct_image_array)
+        # oct_image_new.save(os.path.join(output_img_dir, out_name))
+        # save_ann_png(os.path.join(output_mask_dir, out_name), oct_mask_array)
+        
+        # # for YOLO dataset
+        # yolo_img_name = f"{image_idx:04d}.png"
+        # yolo_mask_name = f"{image_idx:04d}.png"
+        # oct_image_new = Image.fromarray(oct_image_array)
+        # oct_mask_new = Image.fromarray(oct_mask_array)
+        # if image_idx % 10 == 0:
+        #     oct_image_new.save(os.path.join(yolo_img_val_root, yolo_img_name))
+        #     oct_mask_new.save(os.path.join(yolo_mask_val_root, yolo_mask_name))
+        # else:
+        #     oct_image_new.save(os.path.join(yolo_img_train_root, yolo_img_name))
+        #     oct_mask_new.save(os.path.join(yolo_mask_train_root, yolo_mask_name))
+
+        # for few shot learning dataset
+        img_name = f"{image_idx:04d}.png"
+        mask_name = f"{image_idx:04d}.png"
         oct_image_new = Image.fromarray(oct_image_array)
-        oct_image_new.save(os.path.join(output_img_dir, out_name))
-        save_ann_png(os.path.join(output_mask_dir, out_name), oct_mask_array)
+        oct_mask_new = Image.fromarray(oct_mask_array)
+        oct_image_new.save(os.path.join(fs_img_root, img_name))
+        oct_mask_new.save(os.path.join(fs_mask_root, mask_name))
+        image_idx += 1
 
 
         tool_image_F = tool_image.transpose(Image.FLIP_LEFT_RIGHT)
@@ -324,7 +361,29 @@ for patient in tqdm(patients):
         oct_mask_array[:, x1:x2] = 0
         oct_mask_array[mask] = tool_mask_array[mask]
 
-        out_name = oct_name.split('_')[1][3:]
+        # # for SAM2 dataset
+        # out_name = oct_name.split('_')[1][3:]
+        # oct_image_new = Image.fromarray(oct_image_array)
+        # oct_image_new.save(os.path.join(output_img_dir_F, out_name))
+        # save_ann_png(os.path.join(output_mask_dir_F, out_name), oct_mask_array)
+        
+        # # for YOLO dataset
+        # yolo_img_name = f"{image_idx:04d}.png"
+        # yolo_mask_name = f"{image_idx:04d}.png"
+        # oct_image_new = Image.fromarray(oct_image_array)
+        # oct_mask_new = Image.fromarray(oct_mask_array)
+        # if image_idx % 10 == 0:
+        #     oct_image_new.save(os.path.join(yolo_img_val_root, yolo_img_name))
+        #     oct_mask_new.save(os.path.join(yolo_mask_val_root, yolo_mask_name))
+        # else:
+        #     oct_image_new.save(os.path.join(yolo_img_train_root, yolo_img_name))
+        #     oct_mask_new.save(os.path.join(yolo_mask_train_root, yolo_mask_name))
+        
+        # for few shot learning dataset
+        img_name = f"{image_idx:04d}.png"
+        mask_name = f"{image_idx:04d}.png"
         oct_image_new = Image.fromarray(oct_image_array)
-        oct_image_new.save(os.path.join(output_img_dir_F, out_name))
-        save_ann_png(os.path.join(output_mask_dir_F, out_name), oct_mask_array)
+        oct_mask_new = Image.fromarray(oct_mask_array)
+        oct_image_new.save(os.path.join(fs_img_root, img_name))
+        oct_mask_new.save(os.path.join(fs_mask_root, mask_name))
+        image_idx += 1
