@@ -46,6 +46,8 @@ oct_root = "./datasets/AROI - online/24 patient"
 tools_root = "./datasets/tools"
 output_img_root = "./datasets/Synthetic_iOCT/train/JPEGImages"
 output_mask_root = "./datasets/Synthetic_iOCT/train/Annotations"
+target_img_root = "./datasets/Synthetic_iOCT_set/train/JPEGImages"
+target_mask_root = "./datasets/Synthetic_iOCT_set/train/Annotations"
 
 # Sort paths
 tool_groups = {
@@ -80,6 +82,8 @@ for patient in tqdm(patients):
     output_mask_dir = os.path.join(output_mask_root, f"seq_{p_i}")
     os.makedirs(output_img_dir, exist_ok=True)
     os.makedirs(output_mask_dir, exist_ok=True)
+    target_img_dir = os.path.join(target_img_root, f"seq_{p_i}")
+    target_mask_dir = os.path.join(target_mask_root, f"seq_{p_i}")
 
     all_oct_images = sorted([os.path.join(all_oct_dir, f) for f in os.listdir(all_oct_dir) if f.endswith(".png")])
     labelled_oct_images = sorted([os.path.join(labelled_oct_dir, f) for f in os.listdir(labelled_oct_dir) if f.endswith(".png")])
@@ -167,9 +171,13 @@ for patient in tqdm(patients):
             oct_mask_array[:, x1:x2] = 0
             oct_mask_array[mask] = tool_mask_array[mask]
 
-        out_name = oct_name.split('_')[1][3:]
-        oct_image = Image.fromarray(oct_image_array)
         if oct_mask: 
+            out_name = oct_name.split('_')[1][3:]
+            oct_image = Image.fromarray(oct_image_array)
             oct_image.save(os.path.join(output_img_dir, out_name))
             save_ann_png(os.path.join(output_mask_dir, out_name), oct_mask_array)
 
+            image_target = Image.open(os.path.join(target_img_dir, out_name)).convert("L")
+            tool_target = Image.open(os.path.join(target_mask_dir, out_name)).convert("P")
+            if (image_target - oct_image_array).sum() > 1e-3 or (tool_target - oct_mask_array).sum() > 1e-3:
+                print(f"{patient} {out_name} {(image_target - oct_image_array).sum()} {(tool_target - oct_mask_array).sum()}")
