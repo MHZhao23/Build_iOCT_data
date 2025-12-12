@@ -38,7 +38,7 @@ for root_path in ["./videos/horizontal_data"]: # ["./videos/horizontal_data", ".
         image_path = os.path.join(video_path, "image")
         json_path = os.path.join(video_path, "json")
         mask_path = os.path.join(video_path, "mask")
-        filenames = [os.path.splitext(f)[0] for f in os.listdir(image_path)]
+        filenames = [os.path.splitext(f)[0] for f in os.listdir(json_path)]
         print(video_folder, len(filenames))
         os.makedirs(mask_path, exist_ok=True)
 
